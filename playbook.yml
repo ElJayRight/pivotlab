@@ -1,0 +1,129 @@
+---
+- import_playbook: ./requirements.yml
+
+- name: Pull Docker Image
+  hosts: localhost
+  connection: local
+  become: true
+
+  tasks:
+    - name: Pull image
+      docker_image:
+        name: weibeld/ubuntu-networking
+        source: pull
+
+- name: Configuring Docker networks
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  become: true
+
+  tasks: 
+    - name: Create networks
+      docker_network:
+        name: "{{ item.name }}"
+        ipam_driver: default
+        ipam_driver_options:
+          subnet: "{{ item.subnet }}"
+      loop:
+        - { name: "public", subnet: "192.168.69.0/24" }
+        - { name: "internal", subnet: "10.10.16.0/24" }
+        - { name: "admin", subnet: "10.10.4.0/24" }
+
+- name: Starting containers
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  become: true
+
+  tasks:
+    - name: Starting Container 1
+      docker_container:
+        name: public_box
+        image: weibeld/ubuntu-networking
+        networks:
+          - name: public
+          - name: internal
+        state: started
+        command: sleep 1d
+    
+    - name: Starting Container 2
+      docker_container:
+        name: internal_box
+        image: weibeld/ubuntu-networking
+        networks:
+          - name: internal
+          - name: admin
+        state: started
+        command: sleep 1d
+    
+    - name: Starting Container 3
+      docker_container:
+        name: admin_box
+        image: weibeld/ubuntu-networking
+        networks:
+          - name: admin
+        state: started
+        command: sleep 1d
+  
+- name: Create user accounts and ssh servers
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  become: true
+
+  tasks:
+    - name: Create Docker users
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: useradd -m -d "{{ item.home }}" -s /bin/bash "{{ item.username }}"
+      loop:
+        - { container: "public_box", username: "danny", home: "/home/danny" }
+        - { container: "internal_box", username: "ariana", home: "/home/ariana" }
+        - { container: "admin_box", username: "jack", home: "/home/jack" }
+    
+    - name: Set Docker users' passwords
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: bash -c "echo '{{ item.username }}:{{ item.password }}' | chpasswd"
+      loop:
+        - { container: "public_box", username: "danny", password: "danny" }
+        - { container: "internal_box", username: "ariana", password: "Password1"}
+        - { container: "admin_box", username: "jack", password: "Complexpassword123#" }
+
+    - name: Update package lists
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: apt-get update
+      loop:
+        - { container: "public_box" }
+        - { container: "internal_box" }
+        - { container: "admin_box" }
+
+    - name: Install SSH server
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: apt-get install -y openssh-server wget
+      loop:
+        - { container: "public_box" }
+        - { container: "internal_box" }
+        - { container: "admin_box" }
+    
+    - name: Enable password auth for ssh
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+      loop:
+        - { container: "public_box" }
+        - { container: "internal_box" }
+        - { container: "admin_box" }
+    
+    - name: Restart SSH service
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: service ssh restart
+      loop:
+        - { container: "public_box" }
+        - { container: "internal_box" }
+        - { container: "admin_box" }
+    
