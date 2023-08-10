@@ -100,6 +100,24 @@
         - { container: "internal_box" }
         - { container: "admin_box" }
 
+    - name: Install python3
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: apt-get install -y python3
+      loop:
+        - { container: "public_box" }
+        - { container: "admin_box" }
+
+    - name: Add flag 1
+      community.docker.docker_container_exec:
+        container: "public_box"
+        command: sh -c "echo 'flag{L00k_Mum_1_4m_4_H4ck3r}' > /home/danny/flag.txt"
+
+    - name: Add flag 2
+      community.docker.docker_container_exec:
+        container: "public_box"
+        command: sh -c 'echo "<html><body>flag{R3v3r3e_P0rt_F0rw4rd_g0_Brr}</body></html>" > index.html && sudo chmod 400 index.html && python3 -m http.server &'
+
     - name: Install SSH server
       community.docker.docker_container_exec:
         container: "{{ item.container }}"
