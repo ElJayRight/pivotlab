@@ -22,9 +22,8 @@
     - name: Create networks
       docker_network:
         name: "{{ item.name }}"
-        ipam_driver: default
-        ipam_driver_options:
-          subnet: "{{ item.subnet }}"
+        ipam_config:
+          - subnet: "{{ item.subnet }}"
       loop:
         - { name: "public", subnet: "192.168.69.0/24" }
         - { name: "internal", subnet: "10.10.16.0/24" }
@@ -72,6 +71,7 @@
   connection: local
   become: true
 
+
   tasks:
     - name: Create Docker users
       community.docker.docker_container_exec:
@@ -116,7 +116,33 @@
     - name: Add flag 2
       community.docker.docker_container_exec:
         container: "public_box"
-        command: sh -c 'echo "<html><body>flag{R3v3r3e_P0rt_F0rw4rd_g0_Brr}</body></html>" > index.html && sudo chmod 400 index.html && python3 -m http.server &'
+        command: sh -c "echo '<html><body>flag{R3v3r3e_P0rt_F0rw4rd_g0_Brr}</body></html>' > /index.html"
+
+    - name: Add flag 3
+      community.docker.docker_container_exec:
+        container: "internal_box"
+        command: sh -c "echo 'flag{1m_0v3r_H3r3_N0w}' > /home/ariana/flag.txt"
+
+    - name: Add flag 4
+      community.docker.docker_container_exec:
+        container: "admin_box"
+        command: sh -c "echo 'flag{1m_Wh3r3_Th3_4dm1N5_4r3}' > /home/jack/flag.txt"
+
+    - name: Add flag 5
+      community.docker.docker_container_exec:
+        container: "admin_box"
+        command: sh -c "echo '<html><body>flag{P0rt_F0rw4rd1ng_4nd_P1v0t1ng_Pr0}</body></html>' > /index.html"
+
+    - name: Starting python servers
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: "{{ item.command }}"
+      loop:
+        - {container: "public_box", command: "sh -c 'chmod 400 /index.html'"}
+        - {container: "public_box", command: "sh -c 'python3 -m http.server &'"}
+        - {container: "admin_box", command: "sh -c 'chmod 400 /index.html'"}
+        - {container: "admin_box", command: "sh -c 'python3 -m http.server &'"}
+
 
     - name: Install SSH server
       community.docker.docker_container_exec:
@@ -144,4 +170,19 @@
         - { container: "public_box" }
         - { container: "internal_box" }
         - { container: "admin_box" }
-    
+
+- name: Removing binaries
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  become: true
+
+  tasks:
+    - name: bye bye ssh
+      community.docker.docker_container_exec:
+        container: "{{ item.container }}"
+        command: rm /usr/bin/ssh
+      loop:
+        - { container: "public_box" }
+        - { container: "internal_box" }
+        - { container: "admin_box" }
