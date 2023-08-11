@@ -90,7 +90,7 @@
         - { container: "public_box", username: "danny", password: "danny" }
         - { container: "internal_box", username: "ariana", password: "Password1"}
         - { container: "admin_box", username: "jack", password: "Complexpassword123#" }
-
+       
     - name: Update package lists
       community.docker.docker_container_exec:
         container: "{{ item.container }}"
