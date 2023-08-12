@@ -111,27 +111,27 @@
     - name: Add flag 1
       community.docker.docker_container_exec:
         container: "public_box"
-        command: sh -c "echo 'flag{L00k_Mum_1_4m_4_H4ck3r}' > /home/danny/flag.txt"
+        command: sh -c "echo 'CSEC{L00k_Mum_1_4m_4_H4ck3r}' > /home/danny/flag.txt"
 
     - name: Add flag 2
       community.docker.docker_container_exec:
         container: "public_box"
-        command: sh -c "echo 'flag{R3v3r3e_P0rt_F0rw4rd_g0_Brr}' > /index.html"
+        command: sh -c "echo 'CSEC{R3v3r3e_P0rt_F0rw4rd_g0_Brr}' > /index.html"
 
     - name: Add flag 3
       community.docker.docker_container_exec:
         container: "internal_box"
-        command: sh -c "echo 'flag{1m_0v3r_H3r3_N0w}' > /home/ariana/flag.txt"
+        command: sh -c "echo 'CSEC{1m_0v3r_H3r3_N0w}' > /home/ariana/flag.txt"
 
     - name: Add flag 4
       community.docker.docker_container_exec:
         container: "admin_box"
-        command: sh -c "echo 'flag{1m_Wh3r3_Th3_4dm1N5_4r3}' > /home/jack/flag.txt"
+        command: sh -c "echo 'CSEC{1m_Wh3r3_Th3_4dm1N5_4r3}' > /home/jack/flag.txt"
 
     - name: Add flag 5
       community.docker.docker_container_exec:
         container: "admin_box"
-        command: sh -c "echo 'flag{P0rt_F0rw4rd1ng_4nd_P1v0t1ng_Pr0}' > /index.html"
+        command: sh -c "echo 'CSEC{P0rt_F0rw4rd1ng_4nd_P1v0t1ng_Pr0}' > /index.html"
 
     - name: Get python server files
       community.docker.docker_container_copy_into:
