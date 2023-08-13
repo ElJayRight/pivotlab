@@ -116,7 +116,7 @@
     - name: Add flag 2
       community.docker.docker_container_exec:
         container: "public_box"
-        command: sh -c "echo 'flag 2: CSEC{R3v3r3e_P0rt_F0rw4rd_g0_Brr}' > /index.html"
+        command: sh -c "echo 'flag 2 CSEC{R3v3r3e_P0rt_F0rw4rd_g0_Brr}' > /index.html"
 
     - name: Add flag 3
       community.docker.docker_container_exec:
@@ -131,7 +131,7 @@
     - name: Add flag 5
       community.docker.docker_container_exec:
         container: "admin_box"
-        command: sh -c "echo 'flag 5: CSEC{P0rt_F0rw4rd1ng_4nd_P1v0t1ng_Pr0}' > /index.html"
+        command: sh -c "echo 'flag 5 CSEC{P0rt_F0rw4rd1ng_4nd_P1v0t1ng_Pr0}' > /index.html"
 
     - name: Get python server files
       community.docker.docker_container_copy_into:
