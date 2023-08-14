@@ -11,6 +11,7 @@ source .venv/bin/activate
 3. Build the lab:
 
 chmod +x build.sh
+
 ./build.sh
 
 

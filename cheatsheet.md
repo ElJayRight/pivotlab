@@ -1,4 +1,4 @@
-# Quick reference
+# Quick reference Chisel
 
 ## Start chisel server:
 
@@ -30,4 +30,26 @@ to:
 
 ```bash
 /etc/proxychains.conf
+```
+
+# Quick Reference SSH
+
+To open ssh prompt
+
+```bash
+~C
+```
+
+## Port forward
+
+To forward a port form one end of the ssh connection to another (this is so much better than chisel if you have ssh)
+
+```bash
+ssh> -L <remote_port>:localhost:<localport>
+```
+
+## Socks proxy
+
+```bash
+ssh> -D<port>
 ```
